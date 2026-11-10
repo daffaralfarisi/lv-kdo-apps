@@ -4,6 +4,9 @@
 
 KDO Apps adalah aplikasi untuk mengelola **Kendaraan Dinas Operasional (KDO)** pemerintah daerah. Aplikasi ini mencatat data kendaraan, pegawai penanggung jawab, dan perangkat daerah. Aplikasi juga mengelola penjadwalan service, memantau kendaraan yang sudah layak service, dan mengirim email notifikasi ke pegawai penanggung jawab.
 
+Untuk Screenshot aplikasi dan Koleksi API dan Dump DB ada dilink berikut
+https://drive.google.com/drive/folders/1XUfvcTa2GikipOBEsrOvkDfojuVi6bI-
+
 | Komponen | Teknologi |
 | --- | --- |
 | Backend | Laravel 13 (PHP 8.3), REST API `/api/v1`, Laravel Sanctum |
