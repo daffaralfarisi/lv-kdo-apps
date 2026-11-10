@@ -7,6 +7,14 @@ KDO Apps adalah aplikasi untuk mengelola **Kendaraan Dinas Operasional (KDO)** p
 Untuk Screenshot aplikasi dan Koleksi API dan Dump DB ada dilink berikut
 https://drive.google.com/drive/folders/1XUfvcTa2GikipOBEsrOvkDfojuVi6bI-
 
+akun admin
+email : admin@kdo-apps.test
+password : password
+
+akun user 
+email : user@kdo-apps.test
+password : password
+
 | Komponen | Teknologi |
 | --- | --- |
 | Backend | Laravel 13 (PHP 8.3), REST API `/api/v1`, Laravel Sanctum |
