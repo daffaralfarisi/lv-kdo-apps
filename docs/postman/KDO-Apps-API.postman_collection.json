@@ -1,0 +1,2368 @@
+{
+    "info": {
+        "_postman_id": "fccba5a5-9673-57ad-83f1-d86e692fe1aa",
+        "name": "KDO Apps API v1",
+        "description": "Pengujian REST API aplikasi Monitoring KDO (Kendaraan Dinas Operasional).\n\nCara pakai:\n1. Atur variabel collection `base_url` (default http://127.0.0.1:8000).\n2. Jalankan folder berurutan atau seluruh collection lewat Collection Runner.\n3. Token login disimpan otomatis; ID data uji disimpan ke variabel collection.\n4. Folder 9 menghapus semua data uji.\n\nEmail notifikasi bisa dicek di Mailpit: http://localhost:8025",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "event": [
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "pm.test('Respons berformat JSON', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json'); });"
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000",
+            "type": "string"
+        },
+        {
+            "key": "email_admin",
+            "value": "admin@kdo-apps.test",
+            "type": "string"
+        },
+        {
+            "key": "password_admin",
+            "value": "password",
+            "type": "string"
+        },
+        {
+            "key": "email_user",
+            "value": "user@kdo-apps.test",
+            "type": "string"
+        },
+        {
+            "key": "password_user",
+            "value": "password",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "token_user",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "perangkat_daerah_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "pegawai_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "kendaraan_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "jadwal_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "user_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "mode_email",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "penerima_dev",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "nama_perangkat_baru",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "nip_baru",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "email_pegawai_baru",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "nopol_input",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "nopol_baru",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "tanggal_mulai",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "tanggal_selesai",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "email_user_baru",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Autentikasi",
+            "description": "Login mode token (klien eksternal). Token disimpan otomatis ke variabel `token` / `token_user` dan dipakai sebagai Bearer di seluruh collection.",
+            "item": [
+                {
+                    "name": "Login Admin (token)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_email\": \"{{email_admin}}\",\n    \"kdo_password\": \"{{password_admin}}\",\n    \"device_name\": \"postman\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "description": "Tanpa header Origin/Referer, server memperlakukan request sebagai klien eksternal dan mengembalikan token Sanctum. Throttle: 5 percobaan/menit."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Token Bearer diterima', function () { pm.expect(json.data.token).to.be.a('string').and.not.empty; });",
+                                    "pm.test('Role admin', function () { pm.expect(json.data.user.kdo_role).to.eql('admin'); });",
+                                    "pm.collectionVariables.set('token', json.data.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Login User (token)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_email\": \"{{email_user}}\",\n    \"kdo_password\": \"{{password_user}}\",\n    \"device_name\": \"postman\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "description": "Token role user dipakai untuk contoh 403 di folder 8."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Role user', function () { pm.expect(json.data.user.kdo_role).to.eql('user'); });",
+                                    "pm.collectionVariables.set('token_user', json.data.token);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Profil Saya",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/me",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "me"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Profil admin', function () { pm.expect(pm.response.json().data.kdo_email).to.eql(pm.collectionVariables.get('email_admin')); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "2. Perangkat Daerah",
+            "description": "CRUD instansi. Perangkat daerah yang masih punya pegawai tidak bisa dihapus (409).",
+            "item": [
+                {
+                    "name": "Daftar Perangkat Daerah",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/perangkat-daerah?per_page=10&sort=kdo_nama_perangkat&direction=asc",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "perangkat-daerah"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "10",
+                                    "description": "Jumlah baris per halaman (1-500)"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "kdo_nama_perangkat",
+                                    "description": "kdo_nama_perangkat | kdo_status_perangkat | pegawai_count | kendaraan_count"
+                                },
+                                {
+                                    "key": "direction",
+                                    "value": "asc",
+                                    "description": "asc | desc"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "Dinas",
+                                    "description": "Cari nama perangkat",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "kdo_status_perangkat",
+                                    "value": "aktif",
+                                    "description": "aktif | tidak_aktif",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Berisi data & meta pagination', function () { pm.expect(json.data).to.be.an('array'); pm.expect(json.meta.total).to.be.a('number'); });",
+                                    "pm.test('Ada hitungan pegawai & kendaraan', function () { if (json.data.length) { pm.expect(json.data[0]).to.have.property('pegawai_count'); pm.expect(json.data[0]).to.have.property('kendaraan_count'); } });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Tambah Perangkat Daerah",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/perangkat-daerah",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "perangkat-daerah"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_nama_perangkat\": \"{{nama_perangkat_baru}}\",\n    \"kdo_status_perangkat\": \"aktif\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.collectionVariables.set('nama_perangkat_baru', 'Dinas Uji Postman ' + Date.now());"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                                    "",
+                                    "pm.test('Nama tersimpan', function () { pm.expect(pm.response.json().data.kdo_nama_perangkat).to.eql(pm.collectionVariables.get('nama_perangkat_baru')); });",
+                                    "pm.collectionVariables.set('perangkat_daerah_id', pm.response.json().data.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Detail Perangkat Daerah",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/perangkat-daerah/{{perangkat_daerah_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "perangkat-daerah",
+                                "{{perangkat_daerah_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('ID sesuai', function () { pm.expect(String(pm.response.json().data.id)).to.eql(String(pm.collectionVariables.get('perangkat_daerah_id'))); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Ubah Perangkat Daerah",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/perangkat-daerah/{{perangkat_daerah_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "perangkat-daerah",
+                                "{{perangkat_daerah_id}}"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_nama_perangkat\": \"{{nama_perangkat_baru}} (diubah)\",\n    \"kdo_status_perangkat\": \"aktif\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Nama diperbarui', function () { pm.expect(pm.response.json().data.kdo_nama_perangkat).to.include('(diubah)'); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "3. Pegawai",
+            "description": "CRUD pegawai (PNS penanggung jawab). Setiap pegawai wajib punya perangkat daerah.",
+            "item": [
+                {
+                    "name": "Daftar Pegawai",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/pegawai?per_page=10&sort=kdo_nama_pegawai&direction=asc",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "pegawai"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "10",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "kdo_nama_pegawai",
+                                    "description": "kdo_nama_pegawai | kdo_nip | kdo_jabatan | kdo_golongan | kendaraan_count"
+                                },
+                                {
+                                    "key": "direction",
+                                    "value": "asc",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "kdo_perangkat_daerah_id",
+                                    "value": "{{perangkat_daerah_id}}",
+                                    "description": "Filter perangkat daerah",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "kdo_golongan",
+                                    "value": "III/a",
+                                    "description": "I/a ... IV/e",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "",
+                                    "description": "Nama / NIP / jabatan",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Setiap pegawai memuat perangkat daerah', function () { json.data.forEach(function (p) { pm.expect(p.perangkat_daerah).to.be.an('object'); }); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Tambah Pegawai",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/pegawai",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "pegawai"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_perangkat_daerah_id\": {{perangkat_daerah_id}},\n    \"kdo_nama_pegawai\": \"Rudi Hartono\",\n    \"kdo_nip\": \"{{nip_baru}}\",\n    \"kdo_jabatan\": \"Kepala Seksi Sarana dan Prasarana\",\n    \"kdo_golongan\": \"III/c\",\n    \"kdo_email\": \"{{email_pegawai_baru}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "NIP (18 digit) dan email dibuat acak di pre-request script agar bisa dijalankan berulang."
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "var acak = String(Math.floor(Math.random() * 900) + 100);",
+                                    "pm.collectionVariables.set('nip_baru', '19880512201201' + '1' + acak);",
+                                    "pm.collectionVariables.set('email_pegawai_baru', 'pegawai.' + Date.now() + '@kdo-apps.test');"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                                    "",
+                                    "var data = pm.response.json().data;",
+                                    "pm.test('Pegawai berada di perangkat daerah baru', function () { pm.expect(String(data.perangkat_daerah.id)).to.eql(String(pm.collectionVariables.get('perangkat_daerah_id'))); });",
+                                    "pm.collectionVariables.set('pegawai_id', pm.response.json().data.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Detail Pegawai",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/pegawai/{{pegawai_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "pegawai",
+                                "{{pegawai_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Memuat daftar kendaraan tanggungan', function () { pm.expect(pm.response.json().data.kendaraan).to.be.an('array'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Ubah Pegawai",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/pegawai/{{pegawai_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "pegawai",
+                                "{{pegawai_id}}"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_perangkat_daerah_id\": {{perangkat_daerah_id}},\n    \"kdo_nama_pegawai\": \"Rudi Hartono, S.T.\",\n    \"kdo_nip\": \"{{nip_baru}}\",\n    \"kdo_jabatan\": \"Kepala Seksi Sarana dan Prasarana\",\n    \"kdo_golongan\": \"IV/a\",\n    \"kdo_email\": \"{{email_pegawai_baru}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Golongan diperbarui', function () { pm.expect(pm.response.json().data.kdo_golongan).to.eql('IV/a'); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "4. Kendaraan",
+            "description": "CRUD kendaraan dinas. Perangkat daerah kendaraan mengikuti pegawai penanggung jawab (`pegawai.perangkat_daerah`).",
+            "item": [
+                {
+                    "name": "Daftar Kendaraan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan?per_page=10&sort=kdo_tahun_produksi&direction=asc",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "10",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "kdo_tahun_produksi",
+                                    "description": "kdo_nomor_polisi | kdo_merek | kdo_tipe | kdo_tahun_produksi | kdo_warna | kdo_kondisi | kdo_status"
+                                },
+                                {
+                                    "key": "direction",
+                                    "value": "asc",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "kdo_kondisi",
+                                    "value": "rusak_ringan",
+                                    "description": "baik | rusak_ringan | rusak_berat",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "kdo_status",
+                                    "value": "aktif",
+                                    "description": "aktif | dalam_service | tidak_aktif",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "kdo_pegawai_id",
+                                    "value": "{{pegawai_id}}",
+                                    "description": "Filter penanggung jawab",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "",
+                                    "description": "Nopol / merek / tipe",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Berisi data', function () { pm.expect(pm.response.json().data).to.be.an('array'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Tambah Kendaraan",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_pegawai_id\": {{pegawai_id}},\n    \"kdo_nomor_polisi\": \"{{nopol_input}}\",\n    \"kdo_merek\": \"Toyota\",\n    \"kdo_tipe\": \"Innova Reborn 2.4 V\",\n    \"kdo_tahun_produksi\": 2018,\n    \"kdo_warna\": \"Hitam\",\n    \"kdo_kondisi\": \"rusak_ringan\",\n    \"kdo_status\": \"aktif\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Nomor polisi dikirim huruf kecil tanpa spasi (mis. b1234pst) untuk menunjukkan normalisasi menjadi \"B 1234 PST\"."
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "var nomor = Math.floor(Math.random() * 9000) + 1000;",
+                                    "pm.collectionVariables.set('nopol_input', 'b' + nomor + 'pst');",
+                                    "pm.collectionVariables.set('nopol_baru', 'B ' + nomor + ' PST');"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                                    "",
+                                    "var data = pm.response.json().data;",
+                                    "pm.test('Nomor polisi dinormalisasi', function () { pm.expect(data.kdo_nomor_polisi).to.eql(pm.collectionVariables.get('nopol_baru')); });",
+                                    "pm.test('Layak service (umur > 5 th & rusak ringan)', function () { pm.expect(data.kdo_alasan_service.length).to.be.at.least(1); });",
+                                    "pm.collectionVariables.set('kendaraan_id', pm.response.json().data.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Detail Kendaraan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan/{{kendaraan_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan",
+                                "{{kendaraan_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "var data = pm.response.json().data;",
+                                    "pm.test('Perangkat daerah mengikuti pegawai', function () { pm.expect(String(data.pegawai.perangkat_daerah.id)).to.eql(String(pm.collectionVariables.get('perangkat_daerah_id'))); });",
+                                    "pm.test('Memuat riwayat jadwal service', function () { pm.expect(data.penjadwalan_service).to.be.an('array'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Ubah Kendaraan",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan/{{kendaraan_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan",
+                                "{{kendaraan_id}}"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_pegawai_id\": {{pegawai_id}},\n    \"kdo_nomor_polisi\": \"{{nopol_baru}}\",\n    \"kdo_merek\": \"Toyota\",\n    \"kdo_tipe\": \"Innova Reborn 2.4 V\",\n    \"kdo_tahun_produksi\": 2018,\n    \"kdo_warna\": \"Putih\",\n    \"kdo_kondisi\": \"rusak_ringan\",\n    \"kdo_status\": \"aktif\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Warna diperbarui', function () { pm.expect(pm.response.json().data.kdo_warna).to.eql('Putih'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Filter Kendaraan per Perangkat Daerah",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan?kdo_perangkat_daerah_id={{perangkat_daerah_id}}&per_page=50",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "kdo_perangkat_daerah_id",
+                                    "value": "{{perangkat_daerah_id}}",
+                                    "description": "Difilter melalui pegawai penanggung jawab"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "50",
+                                    "description": ""
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "var json = pm.response.json();",
+                                    "var idPerangkat = String(pm.collectionVariables.get('perangkat_daerah_id'));",
+                                    "pm.test('Semua kendaraan milik perangkat daerah yang difilter', function () { json.data.forEach(function (k) { pm.expect(String(k.pegawai.perangkat_daerah.id)).to.eql(idPerangkat); }); });",
+                                    "pm.test('Kendaraan baru ikut tampil', function () { pm.expect(json.data.map(function (k) { return String(k.id); })).to.include(String(pm.collectionVariables.get('kendaraan_id'))); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "5. Penjadwalan Service",
+            "description": "CRUD jadwal service. Status jadwal (dijadwalkan/berlangsung/selesai) dihitung otomatis dari tanggal.",
+            "item": [
+                {
+                    "name": "Daftar Jadwal Service",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/penjadwalan-service?per_page=10&sort=kdo_service_mulai&direction=desc",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "penjadwalan-service"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "10",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "kdo_service_mulai",
+                                    "description": "kdo_service_mulai | kdo_service_selesai"
+                                },
+                                {
+                                    "key": "direction",
+                                    "value": "desc",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "kdo_status_jadwal",
+                                    "value": "berlangsung",
+                                    "description": "dijadwalkan | berlangsung | selesai",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "tanggal_dari",
+                                    "value": "2026-11-01",
+                                    "description": "YYYY-MM-DD (tanggal mulai service)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "tanggal_sampai",
+                                    "value": "2026-11-30",
+                                    "description": "YYYY-MM-DD",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "kdo_perangkat_daerah_id",
+                                    "value": "{{perangkat_daerah_id}}",
+                                    "description": "",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "",
+                                    "description": "Nomor polisi",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Tambah Jadwal Service",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/penjadwalan-service",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "penjadwalan-service"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_kendaraan_id\": {{kendaraan_id}},\n    \"kdo_service_mulai\": \"{{tanggal_mulai}}\",\n    \"kdo_service_selesai\": \"{{tanggal_selesai}}\",\n    \"kdo_keterangan\": \"Servis berkala, ganti oli dan perbaikan rem\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "function tanggal(tambahHari) { var d = new Date(); d.setDate(d.getDate() + tambahHari); return d.toISOString().slice(0, 10); }",
+                                    "pm.collectionVariables.set('tanggal_mulai', tanggal(3));",
+                                    "pm.collectionVariables.set('tanggal_selesai', tanggal(5));"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                                    "",
+                                    "pm.test('Status jadwal dijadwalkan', function () { pm.expect(pm.response.json().data.kdo_status_jadwal).to.eql('dijadwalkan'); });",
+                                    "pm.collectionVariables.set('jadwal_id', pm.response.json().data.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Detail Jadwal Service",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/penjadwalan-service/{{jadwal_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "penjadwalan-service",
+                                "{{jadwal_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Ubah Jadwal Service",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/penjadwalan-service/{{jadwal_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "penjadwalan-service",
+                                "{{jadwal_id}}"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_kendaraan_id\": {{kendaraan_id}},\n    \"kdo_service_mulai\": \"{{tanggal_mulai}}\",\n    \"kdo_service_selesai\": \"{{tanggal_selesai}}\",\n    \"kdo_keterangan\": \"Servis berkala, ganti oli, perbaikan rem dan spooring\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Keterangan diperbarui', function () { pm.expect(pm.response.json().data.kdo_keterangan).to.include('spooring'); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "6. Monitoring & Email Notifikasi",
+            "description": "Monitoring kendaraan layak service (umur > 5 tahun, rusak ringan, rusak berat) dan kirim email ke penanggung jawab. Email yang terkirim bisa dilihat di Mailpit: http://localhost:8025",
+            "item": [
+                {
+                    "name": "Ringkasan Monitoring",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/monitoring/ringkasan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "monitoring",
+                                "ringkasan"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "var data = pm.response.json().data;",
+                                    "pm.test('Ringkasan berisi angka', function () { pm.expect(data.layak_service).to.be.a('number'); pm.expect(data.per_perangkat_daerah).to.be.an('array'); });",
+                                    "pm.collectionVariables.set('mode_email', data.mode_email.kode);",
+                                    "pm.collectionVariables.set('penerima_dev', data.mode_email.penerima_dev || '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Monitoring - Semua Kriteria",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/monitoring/kendaraan?per_page=50&sort=kdo_tahun_produksi&direction=asc",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "monitoring",
+                                "kendaraan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "50",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "kdo_tahun_produksi",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "direction",
+                                    "value": "asc",
+                                    "description": ""
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Semua baris memenuhi kriteria', function () { json.data.forEach(function (k) { pm.expect(k.kdo_alasan_service.length).to.be.at.least(1); }); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Monitoring - Umur > 5 Tahun",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/monitoring/kendaraan?kriteria=umur&per_page=50",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "monitoring",
+                                "kendaraan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "kriteria",
+                                    "value": "umur",
+                                    "description": "umur | rusak_ringan | rusak_berat"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "50",
+                                    "description": ""
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Semua baris memenuhi kriteria', function () { json.data.forEach(function (k) { pm.expect(k.kdo_umur).to.be.above(5); }); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Monitoring - Rusak Ringan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/monitoring/kendaraan?kriteria=rusak_ringan&per_page=50",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "monitoring",
+                                "kendaraan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "kriteria",
+                                    "value": "rusak_ringan",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "50",
+                                    "description": ""
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Semua baris memenuhi kriteria', function () { json.data.forEach(function (k) { pm.expect(k.kdo_kondisi).to.eql('rusak_ringan'); }); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Monitoring - Rusak Berat",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/monitoring/kendaraan?kriteria=rusak_berat&per_page=50",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "monitoring",
+                                "kendaraan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "kriteria",
+                                    "value": "rusak_berat",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "50",
+                                    "description": ""
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Semua baris memenuhi kriteria', function () { json.data.forEach(function (k) { pm.expect(k.kdo_kondisi).to.eql('rusak_berat'); }); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Monitoring - Belum Dinotifikasi",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/monitoring/kendaraan?status_notifikasi=belum&per_page=50",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "monitoring",
+                                "kendaraan"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status_notifikasi",
+                                    "value": "belum",
+                                    "description": "belum | sudah (dihitung per mode email aktif)"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "50",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "kdo_perangkat_daerah_id",
+                                    "value": "{{perangkat_daerah_id}}",
+                                    "description": "",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "",
+                                    "description": "Nopol / merek / tipe / nama pegawai",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "var json = pm.response.json();",
+                                    "pm.test('Semua baris memenuhi kriteria', function () { json.data.forEach(function (k) { pm.expect(k.notifikasi_terakhir_pada).to.eql(null); }); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Kirim Email Notifikasi",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan/{{kendaraan_id}}/notifikasi-service",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan",
+                                "{{kendaraan_id}}",
+                                "notifikasi-service"
+                            ]
+                        },
+                        "description": "Mode dev: email dialihkan ke KDO_EMAIL_DEV_PENERIMA. Mode prod: dikirim ke email pegawai. Cek hasilnya di Mailpit http://localhost:8025."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                                    "",
+                                    "var json = pm.response.json();",
+                                    "var mode = pm.collectionVariables.get('mode_email');",
+                                    "var harapan = mode === 'dev' ? pm.collectionVariables.get('penerima_dev') : pm.collectionVariables.get('email_pegawai_baru');",
+                                    "pm.test('Mode email tercatat', function () { pm.expect(json.data.kdo_mode).to.eql(mode); });",
+                                    "pm.test('Tujuan email sesuai mode (dev = penerima dev, prod = email pegawai)', function () { pm.expect(json.data.kdo_email_tujuan).to.eql(harapan); });",
+                                    "console.log(json.message);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Riwayat Email Kendaraan",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan/{{kendaraan_id}}/notifikasi-service",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan",
+                                "{{kendaraan_id}}",
+                                "notifikasi-service"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Riwayat berisi email yang baru dikirim', function () { pm.expect(pm.response.json().data.length).to.be.at.least(1); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "7. Master User (Admin)",
+            "description": "Khusus role admin. Role user mendapat 403.",
+            "item": [
+                {
+                    "name": "Daftar User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users?per_page=10",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "10",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "kdo_role",
+                                    "value": "admin",
+                                    "description": "admin | user",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "",
+                                    "description": "Nama / email",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Tambah User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_nama_user\": \"Operator Postman\",\n    \"kdo_email\": \"{{email_user_baru}}\",\n    \"kdo_role\": \"user\",\n    \"kdo_password\": \"rahasia123\",\n    \"kdo_password_confirmation\": \"rahasia123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.collectionVariables.set('email_user_baru', 'operator.' + Date.now() + '@kdo-apps.test');"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 201 Created', function () { pm.response.to.have.status(201); });",
+                                    "",
+                                    "pm.test('Password tidak ikut dikembalikan', function () { pm.expect(pm.response.json().data).to.not.have.property('kdo_password'); });",
+                                    "pm.collectionVariables.set('user_id', pm.response.json().data.id);"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Detail User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/{{user_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users",
+                                "{{user_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Ubah User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/{{user_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users",
+                                "{{user_id}}"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_nama_user\": \"Operator Postman (diubah)\",\n    \"kdo_email\": \"{{email_user_baru}}\",\n    \"kdo_role\": \"user\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "description": "Password boleh dikosongkan saat ubah data; isi kdo_password + kdo_password_confirmation untuk menggantinya."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "",
+                                    "pm.test('Nama diperbarui', function () { pm.expect(pm.response.json().data.kdo_nama_user).to.include('(diubah)'); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "8. Contoh Respons Error",
+            "description": "Contoh respons 401, 403, 404, 409, dan 422 dengan pesan Bahasa Indonesia.",
+            "item": [
+                {
+                    "name": "Validasi Gagal (422)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"kdo_nomor_polisi\": \"12-ABC\",\n    \"kdo_kondisi\": \"hilang\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 422 Unprocessable', function () { pm.response.to.have.status(422); });",
+                                    "",
+                                    "var errors = pm.response.json().errors;",
+                                    "pm.test('Error per field', function () { pm.expect(errors).to.have.property('kdo_nomor_polisi'); pm.expect(errors).to.have.property('kdo_pegawai_id'); pm.expect(errors).to.have.property('kdo_kondisi'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Tanpa Token (401)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan"
+                            ]
+                        },
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 401 Unauthorized', function () { pm.response.to.have.status(401); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Data Tidak Ditemukan (404)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan/999999999",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan",
+                                "999999999"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 404 Not Found', function () { pm.response.to.have.status(404); });",
+                                    "",
+                                    "pm.test('Pesan Indonesia', function () { pm.expect(pm.response.json().message).to.eql('Data tidak ditemukan.'); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Role User Akses Master User (403)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_user}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 403 Forbidden', function () { pm.response.to.have.status(403); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Hapus Perangkat yang Masih Punya Pegawai (409)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/perangkat-daerah/{{perangkat_daerah_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "perangkat-daerah",
+                                "{{perangkat_daerah_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 409 Conflict', function () { pm.response.to.have.status(409); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Hapus Pegawai yang Masih Punya Kendaraan (409)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/pegawai/{{pegawai_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "pegawai",
+                                "{{pegawai_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 409 Conflict', function () { pm.response.to.have.status(409); });"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "9. Hapus Data Uji & Logout",
+            "description": "Menghapus data yang dibuat collection ini (urutan: jadwal → kendaraan → pegawai → perangkat daerah → user), lalu logout kedua token.",
+            "item": [
+                {
+                    "name": "Hapus Jadwal Service",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/penjadwalan-service/{{jadwal_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "penjadwalan-service",
+                                "{{jadwal_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Hapus Kendaraan",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/kendaraan/{{kendaraan_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "kendaraan",
+                                "{{kendaraan_id}}"
+                            ]
+                        },
+                        "description": "Riwayat email kendaraan ikut terhapus (cascade)."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Hapus Pegawai",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/pegawai/{{pegawai_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "pegawai",
+                                "{{pegawai_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Hapus Perangkat Daerah",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/perangkat-daerah/{{perangkat_daerah_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "perangkat-daerah",
+                                "{{perangkat_daerah_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Hapus User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/users/{{user_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "users",
+                                "{{user_id}}"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Logout User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_user}}",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "pm.collectionVariables.set('token_user', '');"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Logout Admin",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/auth/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test('Status 200 OK', function () { pm.response.to.have.status(200); });",
+                                    "pm.collectionVariables.set('token', '');"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

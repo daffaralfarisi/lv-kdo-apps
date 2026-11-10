@@ -2,31 +2,47 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\RoleUser;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Table('kdo_user')]
+#[Fillable(['kdo_nama_user', 'kdo_email', 'kdo_password', 'kdo_role'])]
+#[Hidden(['kdo_password', 'kdo_remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory;
+
+    const CREATED_AT = 'kdo_created_at';
+
+    const UPDATED_AT = 'kdo_updated_at';
 
     /**
-     * Get the attributes that should be cast.
-     *
+     * Kolom password & remember token mengikuti konvensi prefix kdo_.
+     */
+    protected $authPasswordName = 'kdo_password';
+
+    protected $rememberTokenName = 'kdo_remember_token';
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'kdo_password' => 'hashed',
+            'kdo_role' => RoleUser::class,
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->kdo_role === RoleUser::Admin;
     }
 }
