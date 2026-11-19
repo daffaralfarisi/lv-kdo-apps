@@ -17,7 +17,7 @@ Aplikasi pengelolaan **Kendaraan Dinas Operasional (KDO)**: Laravel 13, frontend
 2. **Master Pegawai** (PNS penanggung jawab): CRUD, perangkat daerah tempat bertugas, filter perangkat daerah & golongan, daftar kendaraan tanggungan.
 3. **Master Perangkat Daerah**: CRUD (Dinas Pendidikan, Dinas Kesehatan, Dinas PUPR).
 4. **Master User** (khusus admin): CRUD akun Admin & User.
-5. **Penjadwalan Service**: CRUD jadwal, status otomatis (dijadwalkan/berlangsung/selesai), filter rentang tanggal.
+5. **Penjadwalan Service**: CRUD jadwal, status otomatis (dijadwalkan/berlangsung/selesai), filter rentang tanggal. Jadwal berlangsung/selesai terkunci (hanya bisa dilihat lewat popup detail).
 6. **Dashboard Monitoring**: kendaraan layak service berdasarkan
    a. tahun produksi > 5 tahun, b. kondisi rusak ringan, c. kondisi rusak berat,
    lalu **kirim email** ke pegawai penanggung jawab (mode dev/prod).

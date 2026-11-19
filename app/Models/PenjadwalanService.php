@@ -61,6 +61,14 @@ class PenjadwalanService extends Model
     }
 
     /**
+     * Jadwal yang sudah berlangsung atau selesai tidak boleh diubah/dihapus.
+     */
+    public function terkunci(): bool
+    {
+        return $this->statusJadwal() !== StatusJadwal::Dijadwalkan;
+    }
+
+    /**
      * @param  Builder<self>  $query
      */
     #[Scope]

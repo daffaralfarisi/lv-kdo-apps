@@ -145,6 +145,41 @@ table.kdo-table tbody tr:hover{background:#eef4fb}
 .kdo-popup-table tfoot td{font-weight:800;color:var(--kdo-navy);background:#f8fafc}
 .kdo-popup-foot{font-size:11px;color:#98a2b3;padding:8px 16px;border-top:1px solid var(--kdo-line-table)}
 @media (max-width:575.98px){.kdo-popup-overlay{padding:10px}.kdo-popup-table td,.kdo-popup-table thead th{padding:7px 9px}}
+@keyframes kdoPopupMasuk{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.kdo-popup{animation:kdoPopupMasuk .22s cubic-bezier(.4,0,.2,1)}
+/* Popup kartu detail */
+.kdo-kartu{max-width:720px}
+.kdo-kartu-chip{margin-left:auto}
+.kdo-kartu-chip+.kdo-popup-close{margin-left:6px}
+.kdo-kartu-body{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fafc}
+.kdo-hero,.kdo-keluhan,.kdo-info-card{background:#fff;border:1px solid var(--kdo-line-table);border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.kdo-hero{padding:14px 16px}
+.kdo-hero-tanggal{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.kdo-label-kecil{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--kdo-th)}
+.kdo-hero-nilai{font-size:16px;font-weight:800;color:var(--kdo-navy);line-height:1.3}
+.kdo-progress{height:8px;margin:12px 0 8px;border-radius:999px;background:#e4ecf8;overflow:hidden}
+.kdo-progress>span{display:block;width:0;height:100%;border-radius:999px;background:linear-gradient(90deg,#082556,#287bb5);transition:width .7s cubic-bezier(.4,0,.2,1)}
+.kdo-progress.berlangsung>span{background:linear-gradient(90deg,#fdb022,#dc6803)}
+.kdo-progress.selesai>span{background:linear-gradient(90deg,#32d583,#079455)}
+.kdo-progress.tanpa-akhir>span{background:repeating-linear-gradient(45deg,#f79009 0 8px,#fdb022 8px 16px)}
+.kdo-hero-info{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;font-weight:700;color:#667085}
+.kdo-hero-info i{margin-right:4px}
+.kdo-keluhan{display:flex;gap:11px;padding:12px 14px}
+.kdo-keluhan-icon{flex:none;width:34px;height:34px;border-radius:10px;background:#fff6e0;color:#9a6700;display:flex;align-items:center;justify-content:center}
+.kdo-keluhan-teks{margin-top:2px;white-space:pre-wrap;font-size:13px;line-height:1.55;color:var(--kdo-text)}
+.kdo-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kdo-info-card{padding:13px 15px}
+.kdo-info-card h6{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#667085}
+.kdo-info-card h6 i{color:var(--kdo-primary)}
+.kdo-info-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-top:1px dashed var(--kdo-line-table);font-size:12.5px}
+.kdo-info-row>span{color:#667085;white-space:nowrap}
+.kdo-info-row>b{font-weight:700;color:var(--kdo-navy);text-align:right;word-break:break-word}
+.kdo-plat{display:inline-block;margin-bottom:6px;padding:4px 11px;border-radius:7px;background:#c0261d;color:#fff;font-size:15px;font-weight:800;letter-spacing:1px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+.kdo-info-orang{margin-bottom:6px}
+.kdo-info-orang strong{display:block;font-size:14px;font-weight:800;color:var(--kdo-navy)}
+.kdo-info-alasan{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.kdo-info-alasan .kdo-chip+.kdo-chip{margin-left:0}
+@media (max-width:575.98px){.kdo-info-grid{grid-template-columns:1fr}.kdo-kartu-body{padding:12px}}
 /* Layout — palet sidebar mengikuti warna brand: biru #006cb8 (latar) & oranye #ff9e00 (menu aktif) */
 :root{--kdo-sb-lebar:236px;--kdo-sb-ciut:78px;--kdo-sb-ease:cubic-bezier(.4,0,.2,1);--kdo-sb-durasi:.3s}
 .kdo-sidebar{--kdo-sb-biru:#006cb8;--kdo-sb-oren:#ff9e00;position:fixed;top:0;left:0;bottom:0;width:var(--kdo-sb-lebar);background:var(--kdo-sb-biru);color:#eaf3fb;padding:18px 12px;overflow-x:hidden;overflow-y:auto;z-index:1035;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;transition:width var(--kdo-sb-durasi) var(--kdo-sb-ease),transform var(--kdo-sb-durasi) var(--kdo-sb-ease),box-shadow var(--kdo-sb-durasi)}
@@ -199,6 +234,6 @@ html.kdo-sb-buka .kdo-sb-backdrop{opacity:1;visibility:visible}
 .kdo-main{margin-left:0}
 .kdo-sb-toggle{display:none}
 }
-@media (prefers-reduced-motion:reduce){.kdo-sidebar,.kdo-main,.kdo-sb-toggle,.kdo-menu a,.kdo-menu-teks,.kdo-brand-logo,.kdo-brand-teks{transition:none!important}}
+@media (prefers-reduced-motion:reduce){.kdo-popup,.kdo-progress>span,.kdo-sidebar,.kdo-main,.kdo-sb-toggle,.kdo-menu a,.kdo-menu-teks,.kdo-brand-logo,.kdo-brand-teks{transition:none!important}}
 </style>
 @endonce

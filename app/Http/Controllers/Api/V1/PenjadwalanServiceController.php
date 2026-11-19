@@ -53,16 +53,30 @@ class PenjadwalanServiceController extends Controller
         return new PenjadwalanServiceResource($penjadwalanService->load(['kendaraan.pegawai.perangkatDaerah']));
     }
 
-    public function update(PenjadwalanServiceRequest $request, PenjadwalanService $penjadwalanService): PenjadwalanServiceResource
+    /**
+     * Hanya jadwal berstatus dijadwalkan yang boleh diubah.
+     */
+    public function update(PenjadwalanServiceRequest $request, PenjadwalanService $penjadwalanService): PenjadwalanServiceResource|JsonResponse
     {
+        if ($penjadwalanService->terkunci()) {
+            return response()->json(['message' => 'Jadwal yang sedang berlangsung atau sudah selesai tidak dapat diubah.'], 409);
+        }
+
         $penjadwalanService->update($request->validated());
 
         return (new PenjadwalanServiceResource($penjadwalanService->load(['kendaraan.pegawai.perangkatDaerah'])))
             ->additional(['message' => 'Jadwal service berhasil diperbarui.']);
     }
 
+    /**
+     * Hanya jadwal berstatus dijadwalkan yang boleh dihapus.
+     */
     public function destroy(PenjadwalanService $penjadwalanService): JsonResponse
     {
+        if ($penjadwalanService->terkunci()) {
+            return response()->json(['message' => 'Jadwal yang sedang berlangsung atau sudah selesai tidak dapat dihapus.'], 409);
+        }
+
         $penjadwalanService->delete();
 
         return response()->json(['message' => 'Jadwal service berhasil dihapus.']);

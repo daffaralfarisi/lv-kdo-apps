@@ -46,7 +46,7 @@ Nama field request/response sama dengan kolom database (`kdo_*`). Respons juga m
 | 401 | Belum login / token tidak valid |
 | 403 | Role tidak berhak (mis. user membuka `/users`) |
 | 404 | Data tidak ditemukan |
-| 409 | Tidak bisa dihapus karena masih dipakai (perangkat daerah masih punya pegawai, pegawai masih punya kendaraan, hapus akun sendiri) |
+| 409 | Tidak bisa dihapus/diubah: perangkat daerah masih punya pegawai, pegawai masih punya kendaraan, hapus akun sendiri, atau jadwal service yang sedang berlangsung/sudah selesai |
 | 422 | Validasi gagal: `{ message, errors: { field: [pesan] } }` |
 | 429 | Terlalu banyak percobaan login |
 | 502 | Email gagal dikirim (cek konfigurasi `MAIL_*`) |

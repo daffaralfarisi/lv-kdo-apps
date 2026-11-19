@@ -29,6 +29,7 @@ Tanggal: 10 Nov 2026 · Waktu kerja: ±1 jam
 | 23 | Verifikasi revisi | 6 halaman 200, API relasi baru via pegawai, 33 blok JS lolos `node --check`, 29 test / 83 assertion lulus |
 | 24 | Postman collection | 9 folder / 45 request; dijalankan dengan Newman: 126 assertion lulus, data uji terhapus otomatis (K-21) |
 | 25 | Mailpit | Binary v1.33.1 di `~/.local/bin`, `.env` → SMTP 127.0.0.1:1025; email notifikasi mode dev tertangkap lengkap di Mailpit (K-22) |
+| 26 | Revisi user: detail jadwal service | Jadwal berlangsung/selesai hanya tombol Detail + dikunci di API (409); popup kartu detail (K-23) |
 
 ## Batasan karena waktu (rencana lanjutan)
 - Belum diuji di browser sungguhan (tidak ada Chrome/Playwright di mesin). Verifikasi baru sebatas HTTP + sintaks JS.

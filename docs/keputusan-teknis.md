@@ -117,3 +117,12 @@ Docker tidak tersedia, jadi Mailpit dipasang sebagai binary tingkat user: `~/.lo
 - Mode prod bisa diuji dengan aman karena tidak ada email yang benar-benar terkirim.
 - Mailpit belum dipasang sebagai service permanen; unit file systemd disediakan di `testing-api-dan-email.md` untuk diaktifkan sendiri.
 - Tanpa Mailpit berjalan, kirim email menghasilkan 502 dengan pesan yang jelas.
+
+### K-23 Jadwal service berlangsung/selesai dikunci, diganti popup detail
+Atas permintaan user, baris jadwal *berlangsung* dan *selesai* hanya menampilkan tombol **Detail**. Jadwal *dijadwalkan* tetap bisa diubah/dihapus.
+- Aturan yang sama ditegakkan di API (`PenjadwalanService::terkunci()`, respons 409), jadi tidak bisa ditembus lewat Postman.
+- Popup detail berbentuk kartu (komponen `KDO.popupKartu`, JS murni) dengan isi:
+  - progres jadwal (hari ke-X dari Y);
+  - keluhan/keterangan, memakai field `kdo_keterangan` (tidak ditambah field baru);
+  - kartu kendaraan dengan pelat merah dinas;
+  - kartu penanggung jawab beserta perangkat daerahnya.

@@ -102,26 +102,12 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { KdoSelect.tutupSemua(); } });
     KDO.select = KdoSelect;
 
-    /* ---------- Popup tabel rincian (JS murni) ---------- */
-    KDO.popup = function (o) {
+    /* ---------- Overlay popup bersama (JS murni) ---------- */
+    function bukaOverlay(html) {
         var pemicu = document.activeElement;
-        var kolom = o.kolom || [];
-        var baris = o.baris || [];
-        var sel = function (k, b) { return k.html ? k.html(b) : KDO.atauKosong(b[k.key]); };
-        var isi = baris.length ? baris.map(function (b) {
-            return '<tr>' + kolom.map(function (k) { return '<td class="' + (k.kanan ? 'text-right' : '') + '">' + sel(k, b) + '</td>'; }).join('') + '</tr>';
-        }).join('') : '<tr><td colspan="' + kolom.length + '" class="text-center kdo-kosong">Tidak ada data</td></tr>';
         var overlay = document.createElement('div');
         overlay.className = 'kdo-popup-overlay';
-        overlay.innerHTML = '<div class="kdo-popup" role="dialog" aria-modal="true">'
-            + '<div class="kdo-popup-head"><div class="kdo-popup-icon"><i class="fas ' + (o.ikon || 'fa-list') + '"></i></div>'
-            + '<div><div class="kdo-popup-title">' + KDO.esc(o.judul) + '</div><div class="kdo-popup-sub">' + KDO.esc(o.subjudul || '') + '</div></div>'
-            + '<button type="button" class="kdo-popup-close" aria-label="Tutup">&times;</button></div>'
-            + (o.htmlAtas || '')
-            + '<div class="kdo-popup-body"><table class="kdo-popup-table"><thead><tr>'
-            + kolom.map(function (k) { return '<th class="' + (k.kanan ? 'text-right' : '') + '">' + KDO.esc(k.label) + '</th>'; }).join('')
-            + '</tr></thead><tbody>' + isi + '</tbody>' + (o.tfoot || '') + '</table></div>'
-            + (o.kaki ? '<div class="kdo-popup-foot">' + KDO.esc(o.kaki) + '</div>' : '') + '</div>';
+        overlay.innerHTML = html;
         document.body.appendChild(overlay);
         function tutup() {
             document.removeEventListener('keydown', tombolEsc, true);
@@ -135,6 +121,37 @@
         overlay.addEventListener('click', function (e) { if (e.target === overlay) { tutup(); } });
         overlay.querySelector('.kdo-popup-close').addEventListener('click', tutup);
         overlay.querySelector('.kdo-popup-close').focus();
+        return { overlay: overlay, tutup: tutup };
+    }
+
+    /* ---------- Popup kartu detail (JS murni); o.isi & o.chip berupa HTML yang sudah di-escape ---------- */
+    KDO.popupKartu = function (o) {
+        return bukaOverlay('<div class="kdo-popup kdo-kartu" role="dialog" aria-modal="true" aria-label="' + KDO.esc(o.judul) + '">'
+            + '<div class="kdo-popup-head"><div class="kdo-popup-icon"><i class="fas ' + (o.ikon || 'fa-info') + '"></i></div>'
+            + '<div><div class="kdo-popup-title">' + KDO.esc(o.judul) + '</div><div class="kdo-popup-sub">' + KDO.esc(o.subjudul || '') + '</div></div>'
+            + (o.chip ? '<div class="kdo-kartu-chip">' + o.chip + '</div>' : '')
+            + '<button type="button" class="kdo-popup-close" aria-label="Tutup">&times;</button></div>'
+            + '<div class="kdo-kartu-body">' + o.isi + '</div>'
+            + (o.kaki ? '<div class="kdo-popup-foot">' + KDO.esc(o.kaki) + '</div>' : '') + '</div>');
+    };
+
+    /* ---------- Popup tabel rincian (JS murni) ---------- */
+    KDO.popup = function (o) {
+        var kolom = o.kolom || [];
+        var baris = o.baris || [];
+        var sel = function (k, b) { return k.html ? k.html(b) : KDO.atauKosong(b[k.key]); };
+        var isi = baris.length ? baris.map(function (b) {
+            return '<tr>' + kolom.map(function (k) { return '<td class="' + (k.kanan ? 'text-right' : '') + '">' + sel(k, b) + '</td>'; }).join('') + '</tr>';
+        }).join('') : '<tr><td colspan="' + kolom.length + '" class="text-center kdo-kosong">Tidak ada data</td></tr>';
+        return bukaOverlay('<div class="kdo-popup" role="dialog" aria-modal="true">'
+            + '<div class="kdo-popup-head"><div class="kdo-popup-icon"><i class="fas ' + (o.ikon || 'fa-list') + '"></i></div>'
+            + '<div><div class="kdo-popup-title">' + KDO.esc(o.judul) + '</div><div class="kdo-popup-sub">' + KDO.esc(o.subjudul || '') + '</div></div>'
+            + '<button type="button" class="kdo-popup-close" aria-label="Tutup">&times;</button></div>'
+            + (o.htmlAtas || '')
+            + '<div class="kdo-popup-body"><table class="kdo-popup-table"><thead><tr>'
+            + kolom.map(function (k) { return '<th class="' + (k.kanan ? 'text-right' : '') + '">' + KDO.esc(k.label) + '</th>'; }).join('')
+            + '</tr></thead><tbody>' + isi + '</tbody>' + (o.tfoot || '') + '</table></div>'
+            + (o.kaki ? '<div class="kdo-popup-foot">' + KDO.esc(o.kaki) + '</div>' : '') + '</div>');
     };
 
     /* ---------- SweetAlert2 preset ---------- */
@@ -314,9 +331,13 @@
             }
         });
     };
+    KDO.tombolLihat = function (label) {
+        return '<button type="button" class="kdo-btn-lihat" data-aksi="lihat"><i class="fas fa-file-alt"></i>' + KDO.esc(label || 'Lihat') + '</button>';
+    };
+    /* lihat: true = tombol "Lihat", string = label tombol lihat, false = tanpa tombol lihat */
     KDO.tombolAksi = function (lihat) {
         return '<div class="kdo-aksi">'
-            + (lihat ? '<button type="button" class="kdo-btn-lihat" data-aksi="lihat"><i class="fas fa-file-alt"></i>Lihat</button>' : '')
+            + (lihat ? KDO.tombolLihat(typeof lihat === 'string' ? lihat : 'Lihat') : '')
             + '<button type="button" class="kdo-btn-aksi" data-aksi="edit" title="Ubah"><i class="fas fa-pen"></i></button>'
             + '<button type="button" class="kdo-btn-aksi hapus" data-aksi="hapus" title="Hapus"><i class="fas fa-trash-alt"></i></button></div>';
     };
